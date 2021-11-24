@@ -71,3 +71,19 @@ exports.put = (req, res) => {
 		})
 	}
 }
+
+exports.deleteById = (req, res) => {
+	const userID = req.url.match(/([0-9a-f]+\-?)+/g)[1]
+	if (userID.length != 36) {
+		res.statusCode = 400
+		res.end(JSON.stringify({ Error: "Invalid id" }))
+	}
+	console.log(userID)
+	if (db.deletePerson(userID)) {
+		res.statusCode = 204
+		res.end()
+	} else {
+		res.statusCode = 404
+		res.end(JSON.stringify({ Message: "Person not found" }))
+	}
+}

@@ -1,19 +1,26 @@
-const get = require('./get').get
-const post = require('./post').post
-const put = require('./put').put
+const GET = require('./get').get
+const POST = require('./post').post
+const PUT = require('./put').put
+const DELETE = require('./delete').delete
 
 exports.router = (req, res) => {
 	let method = req.method
 	
 	switch (method) {
 		case "GET":
-			get(req, res)
-			break;
+			GET(req, res)
+			break
 		case "POST":
-			post(req, res)
+			POST(req, res)
+			break
 		case "PUT":
-			put(req, res)		
+			PUT(req, res)
+			break
+		case "DELETE":
+			DELETE(req, res)
+			break
 		default:
-			break;
+			res.end(JSON.stringify({Error: "Unknow request method"}))
+			break
 	}
 }

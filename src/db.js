@@ -17,3 +17,17 @@ exports.putPerson = (person) => {
 	}
 	return { Error: "Person not found" }
 }
+
+exports.deletePerson = (userID) => {
+	console.log(userID)
+	let deleted =  false
+	arr = arr.filter(person => {
+		if (person._id == userID) {
+			deleted = true
+		}
+		return person._id != userID
+	})
+	console.log(deleted)
+	console.log(arr)
+	return deleted
+}
