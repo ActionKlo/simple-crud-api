@@ -9,6 +9,8 @@ exports.put = (req, res) => {
 			break
 	
 		default:
+			res.setStatus = 404
+			res.end(JSON.stringify({ Error: "Page not found"}))
 			break
 	}
 }

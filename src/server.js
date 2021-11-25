@@ -8,8 +8,12 @@ const router = require('./routes').router
 exports.start = () => {
 	let server = http.createServer((req, res) => {
 		res.setHeader('Content-Type', 'application/json')
-
-		router(req, res)
+		try {
+			router(req, res)
+		} catch (e) {
+			res.statusCode = 500
+			res.end(JSON.stringify({ error: "something went wrong" }))
+		}
 	})
 
 	server.listen(config.DEV_PORT, () => {

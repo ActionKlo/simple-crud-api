@@ -5,7 +5,6 @@ exports.get = (req, res) => {
 
 	switch (url) {
 		case "/person":
-		case "/person/":
 			person.getAll(req, res)
 			break
 		case url.match(/\/person\/([0-9a-f]+\-?)+/) !==  null ? url.match(/\/person\/([0-9a-f]+\-?)+/)[0] : 0:

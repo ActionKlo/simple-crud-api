@@ -55,6 +55,11 @@ exports.put = (req, res) => {
 		let person
 		req.on('data', data => {
 			person = JSON.parse(data.toString())
+
+			if (person.name == null || person.age == null || person.hobbies == null) {
+				res.statusCode = 400
+				res.end(JSON.stringify({ error: "not enought data" }))
+			}
 		})
 
 		req.on('end', () => {
@@ -78,7 +83,7 @@ exports.deleteById = (req, res) => {
 		res.statusCode = 400
 		res.end(JSON.stringify({ Error: "Invalid id" }))
 	}
-	console.log(userID)
+	
 	if (db.deletePerson(userID)) {
 		res.statusCode = 204
 		res.end()

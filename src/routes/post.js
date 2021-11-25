@@ -7,9 +7,11 @@ exports.post = (req, res) => {
 	switch (url) {
 		case '/person':
 			person.create(req, res)
-			break;
+			break
 	
 		default:
-			break;
+			res.setStatus = 404
+			res.end(JSON.stringify({ Error: "Page not found"}))
+			break
 	}
 }
