@@ -2,32 +2,25 @@ const db = require('../db')
 const { randomUUID } = require('crypto')
 
 exports.getAll = (req, res) => {
+	res.statusCode = 200
 	res.end(JSON.stringify(db.getAll()))
 }
 
 exports.getById = (req, res) => {
-	const userID = req.url.match(/([0-9a-f]+\-?)+/g)[1] 
-
-	if(userID.length !== 36) {
+	const userID = req.url.match(/^\/person\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/) == null 
+		? 0 
+		: req.url.match(/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)
+	
+	if(userID == 0) {
 		res.statusCode = 400
-		res.end(JSON.stringify({ Error: "Invalid id" }))
+		res.end(JSON.stringify({ error: "Invalid id" }))
 	} else {
-		const persons = db.getAll()
-		
-		// ! сделать рефакторинг и запихнуть в db.js ???
-		// ? 
-		let found = false
-		for (let i = 0; i < persons.length; i++) {
-			if (persons[i]._id == userID) {
-				res.statusCode = 200
-				res.end(JSON.stringify(persons[i]))
-				found = true
-			}
-		}
-		if (!found) {
+		if (db.getById(userID).length == 0) {
 			res.statusCode = 404
-			res.end(JSON.stringify({ Error: "Person not found" }))
-			res.emit('end')
+			res.end(JSON.stringify({ error: "Person not found" }))
+		} else {
+			res.statusCode = 200
+			res.end(JSON.stringify(db.getById(userID)[0]))
 		}
 	}
 }
@@ -38,57 +31,73 @@ exports.create = (req, res) => {
 		person = JSON.parse(data.toString())
 	})
 	req.on('end', () => {
-		person._id = randomUUID()
+		if (!person.name || !person.age || !person.hobbies) {
+			res.statusCode = 400
+			res.end(JSON.stringify({ error: "Not enought data" }))
+		} else {
+			person._id = randomUUID()
 
-		res.statusCode = 201
-		res.end(JSON.stringify(db.addPerson(person)))
-	})
+			res.statusCode = 201
+			res.end(JSON.stringify(db.addPerson(person)))
+		}
+	}) 
 }
 
 exports.put = (req, res) => {
-	const userID = req.url.match(/([0-9a-f]+\-?)+/g)[1]
+	const userID = req.url.match(/^\/person\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/) == null 
+		? 0 
+		: req.url.match(/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)
 
-	if(userID.length !== 36) {
+	if(userID === 0) {
 		res.statusCode = 400
-		res.end(JSON.stringify({ Error: "Invalid id" }))
+		res.end(JSON.stringify({ error: "Invalid id" }))
 	} else {
 		let person
 		req.on('data', data => {
 			person = JSON.parse(data.toString())
-
-			if (person.name == null || person.age == null || person.hobbies == null) {
-				res.statusCode = 400
-				res.end(JSON.stringify({ error: "not enought data" }))
-			}
 		})
 
 		req.on('end', () => {
-			person._id = userID
-
-			let putPerson = db.putPerson(person)
-			if (putPerson.Error) {
-				res.statusCode = 404
-				res.end(JSON.stringify(putPerson))
+			if (!person.name || !person.age || !person.hobbies) {
+				res.statusCode = 400
+				res.end(JSON.stringify({ error: "Not enought data" }))
 			} else {
-				res.statusCode = 200
-				res.end(JSON.stringify(putPerson))
+				person._id = userID
+
+				let putPerson = db.putPerson(person)
+				if (putPerson.error) {
+					res.statusCode = 404
+					res.end(JSON.stringify(putPerson))
+				} else {
+					res.statusCode = 200
+					res.end(JSON.stringify(putPerson))
+				}
 			}
 		})
 	}
 }
 
 exports.deleteById = (req, res) => {
-	const userID = req.url.match(/([0-9a-f]+\-?)+/g)[1]
-	if (userID.length != 36) {
-		res.statusCode = 400
-		res.end(JSON.stringify({ Error: "Invalid id" }))
-	}
+	const userID = req.url.match(/^\/person\/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/) == null 
+		? 0 
+		: req.url.match(/[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/)
 	
-	if (db.deletePerson(userID)) {
-		res.statusCode = 204
-		res.end()
+	if (userID === 0) {
+		res.statusCode = 400
+		res.end(JSON.stringify({ error: "Invalid id" }))
 	} else {
-		res.statusCode = 404
-		res.end(JSON.stringify({ Message: "Person not found" }))
+		if (db.deletePerson(userID)) {
+			res.statusCode = 204
+			res.end()
+		} else {
+			res.statusCode = 404
+			res.end(JSON.stringify({ error: "Person not found" }))
+		}
 	}
+}
+
+exports.deleteAll = (req, res) => {
+	db.clearAll()
+	res.statusCode = 200
+	res.end()
 }

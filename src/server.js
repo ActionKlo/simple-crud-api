@@ -17,6 +17,6 @@ exports.start = () => {
 	})
 
 	server.listen(config.DEV_PORT, () => {
-		console.log(`Server started at port: ${config.DEV_PORT}`)
+		console.info(`Server started at port: ${config.DEV_PORT}`)
 	})
 }

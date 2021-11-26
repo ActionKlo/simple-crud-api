@@ -10,8 +10,8 @@ exports.post = (req, res) => {
 			break
 	
 		default:
-			res.setStatus = 404
-			res.end(JSON.stringify({ Error: "Page not found"}))
+			res.statusCode = 404
+			res.end(JSON.stringify({ error: "Page not found"}))
 			break
 	}
 }

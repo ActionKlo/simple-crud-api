@@ -9,17 +9,23 @@ exports.getAll = () => {
 	return arr
 }
 
+exports.getById = (userID) => {
+	return arr.filter(person => person._id == userID)
+}
+
 exports.putPerson = (person) => {
 	for (let i = 0; i < arr.length; i++) {
 		if (arr[i]._id == person._id) {
-			return arr[i] = person
+			arr[i].name = person.name
+			arr[i].age = person.age
+			arr[i].hobbies = person.hobbies
+			return arr[i]
 		}
 	}
-	return { Error: "Person not found" }
+	return { error: "Person not found" }
 }
 
 exports.deletePerson = (userID) => {
-	console.log(userID)
 	let deleted =  false
 	arr = arr.filter(person => {
 		if (person._id == userID) {
@@ -27,7 +33,10 @@ exports.deletePerson = (userID) => {
 		}
 		return person._id != userID
 	})
-	console.log(deleted)
-	console.log(arr)
+	
 	return deleted
+}
+
+exports.clearAll = () => {
+	return arr = []
 }

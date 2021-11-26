@@ -20,7 +20,8 @@ exports.router = (req, res) => {
 			DELETE(req, res)
 			break
 		default:
-			res.end(JSON.stringify({Error: "Unknow request method"}))
+			res.statusCode = 400
+			res.end(JSON.stringify({ error: "Unknow request method" }))
 			break
 	}
 }
