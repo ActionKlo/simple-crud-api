@@ -5,18 +5,22 @@ const config = dotenv.config().parsed
 
 const router = require('./routes').router
 
-exports.start = () => {
-	let server = http.createServer((req, res) => {
-		res.setHeader('Content-Type', 'application/json')
-		try {
-			router(req, res)
-		} catch (e) {
-			res.statusCode = 500
-			res.end(JSON.stringify({ error: "something went wrong" }))
-		}
-	})
+let server = http.createServer((req, res) => {
+	res.setHeader('Content-Type', 'application/json')
+	try {
+		router(req, res)
+	} catch (e) {
+		res.statusCode = 500
+		res.end(JSON.stringify({ error: "something went wrong" }))
+	}
+})
 
+exports.start = () => {
 	server.listen(config.DEV_PORT, () => {
 		console.info(`Server started at port: ${config.DEV_PORT}`)
 	})
+}
+
+exports.close = (callback) => {
+  server.close(callback)
 }
